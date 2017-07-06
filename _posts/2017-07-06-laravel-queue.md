@@ -9,7 +9,7 @@ tags:
     - Laravel,queue
 ---
 
-###一、介绍
+### 一、介绍
 Laravel 的队列服务为不同的队列后端系统，比如 Beanstalk，Amazon SQS，Redis，甚至是关系型数据库，提供了一套统一的 API 。队列允许你将一个耗时的任务进行延迟处理，例如像 e-mail 发送。这能让应用程序对页面的请求有更快的响应。
 
 队列的配置文件被保存在 config/queue.php 中。在这个文件内你可以找到包含在 Laravel 中的每一种队列驱动的连接配置。队列驱动包括数据库、Beanstalkd、IronMQ、Amazon SQS、Redis 以及 synchronous 驱动（ 本地使用 ）。 队列驱动也可以配置为 null，这样就表示丢弃队列任务。
@@ -20,7 +20,7 @@ Laravel 的队列服务为不同的队列后端系统，比如 Beanstalk，Amazo
 生成存储失败任务表  `php artisan queue:failed-table`  
 运行数据迁移       `php artisan migrate`
 
-###三、配置
+### 三、配置
 * .env配置  
 
 ```
@@ -42,7 +42,7 @@ QUEUE_DRIVER = database （默认值是sync，注意这个参数值，有些时�
 ],
 ```
 
-###四、测试
+### 四、测试
 * 事件文件
 
 ```
@@ -103,6 +103,6 @@ php artisan queue:work --tries=1 --daemon
 
 注意观察数据表，会有一条失败的任务写入
 
-###php artisan queue:work 命令参数详解
+### php artisan queue:work 命令参数详解
 
 
