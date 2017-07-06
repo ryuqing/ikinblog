@@ -4,7 +4,7 @@ title:      "supervisor 守护 php artisan进程"
 subtitle:   " \"supervisor配置与使用\""
 date:       2017-07-04 12:00:00
 author:     "Ikin"
-catalog: true
+catalog: laravel
 tags:
     - Linux
 ---

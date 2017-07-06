@@ -4,7 +4,7 @@ title:      "laravel 消息队列详解"
 subtitle:   " \"laravel队列qu meue\""
 date:       2017-07-04 12:00:00
 author:     "Ikin"
-catalog: true
+catalog: laravel
 tags:
     - Laravel,queue
 ---
