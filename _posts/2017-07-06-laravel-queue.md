@@ -1,12 +1,14 @@
 ---
 layout:     post
 title:      "laravel 消息队列详解"
-subtitle:   " \"laravel队列qu meue\""
+subtitle:   " \"laravel队列qumeue\""
 date:       2017-07-04 12:00:00
 author:     "Ikin"
 catalog: laravel
 tags:
-    - Laravel,queue
+    - Laravel
+    - queue
+    - 消息队列
 ---
 
 ### 一、介绍
@@ -14,7 +16,7 @@ Laravel 的队列服务为不同的队列后端系统，比如 Beanstalk，Amazo
 
 队列的配置文件被保存在 config/queue.php 中。在这个文件内你可以找到包含在 Laravel 中的每一种队列驱动的连接配置。队列驱动包括数据库、Beanstalkd、IronMQ、Amazon SQS、Redis 以及 synchronous 驱动（ 本地使用 ）。 队列驱动也可以配置为 null，这样就表示丢弃队列任务。
 
-###二、驱动的设置
+### 二、驱动的设置
 为了测试观察，建议将驱动设置为database，本文主要以mysql为驱动  
 生成队列驱动表     `php artisan queue:table`  
 生成存储失败任务表  `php artisan queue:failed-table`  
@@ -103,6 +105,6 @@ php artisan queue:work --tries=1 --daemon
 
 注意观察数据表，会有一条失败的任务写入
 
-### php artisan queue:work 命令参数详解
+### 五、php artisan queue:work 命令参数详解
 
 

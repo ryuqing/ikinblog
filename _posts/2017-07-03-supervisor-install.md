@@ -7,8 +7,9 @@ author:     "Ikin"
 catalog: laravel
 tags:
     - Linux
+    - 消息队列
+    - supervisor
 ---
-
 ## 介绍
 >Supervisor 是一个 Python 写的进程管理工具，有时一个进程需要在后台运行，并且意外挂掉后能够自动重启，就需要这么一个管理进程的工具。在 Laravel 开发中，也经常使用到队列监听，可以配合 Supervisor 来管理 Laravel 队列进程。  
 

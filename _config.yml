@@ -3,7 +3,7 @@ title: Ikin Blog
 SEOTitle: 遇青的博客 | Ikin Blog
 header-img: img/home-bg.jpg
 email: ikingreate@gmail.com
-description: "关于前端与设计、黑客与画家 | 黄玄，Web & Mobile Lover，Front-End Engineer，UX Designer | 这里是 @Hux黄玄 的个人博客，与你一起发现更大的世界。"
+description: "关于php、黑客与画家 Web & PHP Lover，Back-End | 这里是 饶遇青 的个人博客，与你一起发现更大的世界。"
 keyword: "遇青的博客, 后端, php, 博客, 个人网站, 互联网, 前端, 设计, 产品"
 url: "https://oschina.online"              # your host, for absolute URL
 baseurl: ""                             # for example, '/blog' if your blog hosted on 'host/blog'
@@ -72,7 +72,7 @@ ga_domain: huangxuan.me
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "看看世界 <br>人生是只有路途的修行"
+sidebar-about-description: "我想好好的看看这个世界 <br>人生是只有路途的修行"
 sidebar-avatar: /img/ikin-avatar.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
