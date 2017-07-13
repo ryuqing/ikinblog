@@ -14,7 +14,7 @@ tags:
 
 在搭建 LAMP/LNMP 服务器时，会经常遇到 PHP-FPM、FastCGI和CGI 这几个概念。如果对它们一知半解，很难搭建出高性能的服务器。接下来我们就以图形方式，解释这些概念之间的关系。
 
-####基础
+#### 基础
 在整个网站架构中，Web Server（如Apache）只是内容的分发者。举个栗子，如果客户端请求的是 index.html，那么Web Server会去文件系统中找到这个文件，发送给浏览器，这里分发的是静态数据。  
 ![GitHub Mark](http://oschina.online/img/in-post/server-html.png "introduct")
 
