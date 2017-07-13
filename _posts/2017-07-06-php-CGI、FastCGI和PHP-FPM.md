@@ -22,10 +22,11 @@ tags:
 ![GitHub Mark](http://oschina.online/img/in-post/fast-cgi-php-2.png "introduct")  
 当Web Server收到 index.php 这个请求后，会启动对应的 CGI 程序，这里就是PHP的解析器。接下来PHP解析器会解析php.ini文件，初始化执行环境，然后处理请求，再以规定CGI规定的格式返回处理后的结果，退出进程，Web server再把结果返回给浏览器。这就是一个完整的动态PHP Web访问流程，接下来再引出这些概念，就好理解多了。
 
-<font color=red>CGI</font>：是 Web Server 与 Web Application 之间数据交换的一种协议。  
-<font color=red> FastCGI </font>：同 CGI，是一种通信协议，但比 CGI 在效率上做了一些优化。同样，SCGI 协议与 FastCGI 类似。  
-<font color=red>PHP-CGI</font>：是 PHP （Web Application）对 Web Server 提供的 CGI 协议的接口程序。
-<font color=red>PHP-FPM</font>：是 PHP（Web Application）对 Web Server 提供的 FastCGI 协议的接口程序，额外还提供了相对智能一些任务管理。  
+* CGI：是 Web Server 与 Web Application 之间数据交换的一种协议。  
+* FastCGI：同 CGI，是一种通信协议，但比 CGI 在效率上做了一些优化。同样，SCGI 协议与 FastCGI 类似。  
+* PHP-CGI：是 PHP （Web Application）对 Web Server 提供的 CGI 协议的接口程序。
+* PHP-FPM：是 PHP（Web Application）对 Web Server 提供的 FastCGI 协议的接口程序，额外还提供了相对智能一些任务管理。  
+  
 关于 WEB  
 Web Server 一般指Apache、Nginx、IIS、Lighttpd、Tomcat等服务器，
 Web Application 一般指PHP、Java、Asp.net等应用程序。
@@ -116,7 +117,7 @@ PHP-CGI就是PHP实现的自带的FastCGI管理器。 虽然是php官方出品�
 
 PHP-FPM通过生成新的子进程可以实现php.ini修改后的平滑重启。
 
-####总结
+#### 总结
 最后，我们来总结一下，这些技术经过不断的升级，可以解决什么问题（不然也不会升级嘛）。
 ![GitHub Mark](http://oschina.online/img/in-post/php-fastcgi-5.png "introduce")  
 所以，如果要搭建一个高性能的PHP WEB服务器，目前最佳的方式是Apache/Nginx + FastCGI + PHP-FPM(+PHP-CGI)方式了，不要再使用 Module加载或者 CGI 方式啦：）
