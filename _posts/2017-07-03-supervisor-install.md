@@ -32,7 +32,7 @@ e.g. 配置商户端命令程序监控目录
 
 ```
 [program:yaoktravel-merchant]
-command                 =  php artisan queue:work --delay=2 --sleep=3 --tries=3 --daemon  //你要监控的命令程序
+command                 =  php artisan queue:work --delay=1 --sleep=1 --tries=3 --daemon  //你要监控的命令程序
 directory               = /srv/merchant/  你的文件目录
 process_name            = %(program_name)s_%(process_num)s
 numprocs                = 6
