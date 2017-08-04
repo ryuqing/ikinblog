@@ -105,11 +105,9 @@ LIBS = -lm -lexpat -liconv -L/usr/local/lib
 ```
 至此，安装完成
 
-## 配置测试 ##
+## 配置 ##
 
 配置基本上和sphinx差不多，只不过coreseek中的配置文件叫 csft.conf,而不是sphinx.conf
-
-配置
 
 ```
 cd /usr/local/coreseek/etc
@@ -178,7 +176,54 @@ searchd
 好了之后，修改配置完毕，保存退出
 :x
 ```
+
+## 测试 ##
+
 生成索引
+
+```
+/usr/local/coreseek/bin/indexer --all
+```
+
+进行索引
+
+```
+/usr/local/coreseek/bin/search '人民'
+```
+如果要从PHP脚本检索索引测试:
+运行守护进程searchd，PHP脚本需要连接到searchd上进行检索:
+
+```
+$ cd /usr/local/coreseek/etc
+$ /usr/local/coreseek/bin/searchd
+```
+
+运行PHP API 附带的test 脚本（运行之前请确认searchd守护进程已启动）
+
+要写sphinx在你的php脚本里起作用有两种方式，1是`include('sphinxapi.php')`;或者直接安装sphinx扩展
+因为本人用的是php7没有找到相匹配的sphinx客户端所以下面仅介绍使用api的例子：
+
+```
+$ cd /源代码安装目录/coreseek/api
+$ vim test3.php
+
+<?php
+ $key = 'number';
+ include('sphinxapi.php');
+ $sp=new SphinxClient();
+ $sp->SetServer('localhost',9312);
+ $sp->SetArrayResult(true); //返回的结果集为数组
+ $sp->SetMatchMode(SPH_MATCH_ALL);  //匹配模式 ANY为关键词自动拆词，ALL为不拆词匹配（完全匹配）
+ $sp->SetSortMode(SPH_SORT_RELEVANCE);
+ $res=$sp->Query($key,'*'); //星号为所有索引源
+ var_dump($res);
+?>
+# 运行
+$ php test3.php
+可以看到搜索结果
+```
+
+> PS：因为coreseek已经不维护了，而我需要上生产环境，不是玩玩而已。网上能找到的新资料实在太少，我已经转[Elasticsearch](https://es.xiaoleilu.com/)搜索方案有很多种，现在阿里出了个search服务更方便。要是资源有限的话，小公司的可以用那个便宜且容易维护，自己没有开发搜索引擎的必要。
 
 
 参考文档
@@ -186,6 +231,7 @@ searchd
 - <http://blog.csdn.net/wepe12/article/details/52931842>
 - <http://www.wuzexin.cn/post-57.html>
 - <https://www.ddhigh.com/php/2017/02/28/php7-compile-sphinx-extension.html>
+- <http://blog.csdn.net/slqgenius/article/details/51964586>
 
 
 
