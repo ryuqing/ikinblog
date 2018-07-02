@@ -24,13 +24,11 @@ tags:
   
 * 2.参考前面php-rar扩展安装（注意路径） [参考](http://oschina.online/2017/07/25/php-rar-extension-install/)
     
+##### 添加MongoDB扩展
+* /usr/local/php7.1/bin/pecl install mongodb
 
 
-
-
-
-
-
+* 参考文档 [lnmp安装php多版本](https://lnmp.org/faq/upgrade1-4.html)   [php安装redis](https://www.cnblogs.com/zoie-blog/p/7171505.html)
 
 
 
