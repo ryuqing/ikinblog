@@ -16,7 +16,7 @@ MongoDB的内存使用机制让它在缓存重建方面更有优势，简而言�
  
 * mongo索引: e.g. `db.person.createIndex( {age: 1} )` MongoDB会额外存储一份按age字段升序排序的索引数据，索引结构类似如下，
 索引通常采用类似btree的结构持久化存储，以保证从索引里快速（ O(logN)的时间复杂度 ）找出某个age值对应的位置信息，然后根据位置信息就能读取出对应的文档。
-
+    
 
 #### 1 慢查询分析流程
 慢查询日志一般作为优化步骤里的第一步。通过慢查询日志，定位每一条语句的查询时间。比如超过了200ms，那么查询超过200ms的语句需要优化。
@@ -85,6 +85,7 @@ Profiling功能肯定是会影响效率的，但是不太严重，原因是他�
 
 #### 4 分析 (略)
 
-* 参考文档及拓展阅读
+* 参考文档及拓展阅读  
 [1.mongodb Profiling 通过慢查询日志分析查询慢的原因 相应优化](http://blog.51cto.com/qiangsh/2052609)  
 [2.mongodb监控工具mongostat](https://blog.csdn.net/u011186019/article/details/70918288)
+[2.Mongodb 参数限制/阀值/](https://blog.csdn.net/cx136295988/article/details/73496784)
