@@ -24,7 +24,8 @@ rpm安装后 配置文件 存放在 ` ls /etc/elasticsearch/`；执行文件 存
 与直接下载的可执行压缩包文件目录不同
 ```
 
-> 网上优秀的文章不少，如果初次使用请把下列文档通读一遍，相信增益不少。我这里权当记录了，后续使用过程中有更深刻的理解再作补充。
+> 网上优秀的文章不少，如果初次使用请把下列文档通读一遍，相信增益不少。我这里权当记录了，后续使用过程中有更深刻的理解再作补充。  
+
 * 参考文档及拓展阅读  
 [Elasticsearch权威指南 - 官方中文文档,使用前至少阅读前几章](https://www.elastic.co/guide/cn/elasticsearch/guide/current/index.html)   --文章基于2.0版本有些可能不对，但依然是很好的书
 [Elasticsearch 官方php客户端](https://www.elastic.co/guide/cn/elasticsearch/php/current/index.html)  
