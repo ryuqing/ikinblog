@@ -15,7 +15,8 @@ tags:
 ### 原理
 ### 安装配置
 
-* 1. 安装xdebug，安装哪个版本参考https://xdebug.org/说明。 下述2.3.3可匹配php 5.4  
+* 1. 安装xdebug，安装哪个版本参考https://xdebug.org/说明。 下述2.3.3可匹配php 5.4    
+
 ```
 pecl install Xdebug-2.3.3 
 
