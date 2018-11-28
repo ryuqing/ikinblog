@@ -11,7 +11,8 @@ tags:
 ---
 
 > 写在前面：代码调试端能被访问很重要（有独立ip或者直接是本地）所以，最好在你的服务器端 先测试一下,如果连接不成功，先解决网络问题  
-`telnet phpstorm机器ip phpstorm配置的debug端口`
+`telnet phpstorm机器ip phpstorm配置的debug端口`  
+
 
 ### 原理
 
