@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "xdebug"
-subtitle:   "PhpStorm+Xdebug+Docker实现断点调试（Mac平台亲测）"
+subtitle:   "PhpStorm+Xdebug+Docker实现断点调试+chrome/postman（Mac平台亲测）"
 date:       2018-08-30 12:00:00
 author:     "Ikin"
 catalog: php
@@ -43,12 +43,12 @@ xdebug.idekey=PHPSTORM
 
 ```
 
-* 2. 配置phpstorm, 如下图
+* 2配置phpstorm, 如下图
 ![配置端口](https://upload-images.jianshu.io/upload_images/752480-ed368fad3d946130..jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp)
 ![配置DBGP](https://upload-images.jianshu.io/upload_images/752480-3e0bd1e70a415519..jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp)
 
-* 3. 安装xdebug_helper插件
+* 3. 安装xdebug_helper插件,开启插件的debug功能。postman需要添加cookie XDEBUG_SESSION=PHPSTORM
 
-* 4. 开启插件的debug功能
+* 4. phpstrom-》run -》 start listening for php connections 打开
 
 * 5. 打断点，访问就这么简单

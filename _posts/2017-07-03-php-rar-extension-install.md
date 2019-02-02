@@ -72,6 +72,13 @@ extension=rar.so
 然后保存退出，重启php-fpm（`service php-fpm restart`） 或者 lnmp
 
 
+* tips:若php自带的扩展可以用php压缩包里面的包安装
+```
+1.下载php包 2.解压后的ext目录里面有fileinfo文件夹
+3.linux上进入fileinfo目录 4.phpize 5../configure --with-php-config=/usr/local/php/bin/php-config  6.make && make install
+7.修改php的配置文件php.ini   在里面任意位置添加下面这一行 extension=fileinfo.so
+```
+
 
 
 
