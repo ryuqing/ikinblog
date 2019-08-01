@@ -1,0 +1,474 @@
+---
+layout:     post
+title:      "mongodb 分布式集群数据存储搭建"
+subtitle:   "mongo分布式集群数据存储搭建"
+date:       2019-03-21 12:00:00
+author:     "Ikin"
+catalog: php
+tags:
+    - php
+    - mongo
+---
+### 一、副本集
+#### 概念
+mongodb的集群搭建方式主要有三种，主从模式，Replica set模式，sharding模式, 三种模式各有优劣，适用于不同的场合，属Replica set应用最为广泛，主从模式现在用的较少，sharding模式最为完备，但配置维护较为复杂。
+
+Mongodb的Replica Set即副本集方式主要有两个目的，一个是数据冗余做故障恢复使用，当发生硬件故障或者其它原因造成的宕机时，可以使用副本进行恢复。另一个是做读写分离，读的请求分流到副本上，减轻主（Primary）的读压力。
+
+Replica Set是mongod的实例集合，它们有着同样的数据内容。包含三类角色： 
+（1）主节点（Primary） 
+接收所有的写请求，然后把修改同步到所有Secondary。一个Replica Set只能有一个Primary节点，当Primary挂掉后，其他Secondary或者Arbiter节点会重新选举出来一个主节点。默认读请求也是发到Primary节点处理的，需要转发到Secondary需要客户端修改一下连接配置。
+
+（2）副本节点（Secondary） 
+与主节点保持同样的数据集。当主节点挂掉的时候，参与选主。
+
+（3）仲裁者（Arbiter） 
+不保有数据，不参与选主，只进行选主投票。使用Arbiter可以减轻数据存储的硬件需求，Arbiter跑起来几乎没什么大的硬件资源需求，但重要的一点是，在生产环境下它和其他数据节点不要部署在同一台机器上。 
+注意，一个自动failover的Replica Set节点数必须为奇数，目的是选主投票的时候要有一个大多数才能进行选主决策。
+
+（4）选主过程 
+其中Secondary宕机，不受影响，若Primary宕机，会进行重新选主： 
+
+### 副本集搭建
+(1) 主机用途  
+```
+192.168.20.54 主节点(master)
+192.168.20.126		备节点
+192.168.20.68:27017	仲裁点
+```
+
+(2) mongo安装  
+```
+vi /etc/yum.repos.d/mongodb-org-3.4.repo
+#粘贴如下内容
+[mongodb-org-3.4]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.4/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-3.4.asc
+
+=安装=
+yum install -y mongodb-org
+service mongod start
+chkconfig mongod on
+
+
+vi /etc/mongod.conf
+
+#需要修改 bind_ip = 0.0.0.0
+#如果更改存储路径需要修改storage\dbPath ,若修改了此目录，需要保证将此目录owner设为 mongod:mongod
+
+#确保目录存在
+mkdir /path/to/dbPath
+chown  mongod:mongod /path/to/dbPath
+
+service mongod restart
+```
+
+(3) 配置  
+```
+vi /etc/mongod.conf
+
+##增加或替换项
+net:
+  port: 27017
+  bindIp: 0.0.0.0  # Listen to local interface only, comment to listen on all interfaces.
+replication:
+   replSetName: conifg # config_id name
+```
+`service mongod restart`
+进入主节点输入命令
+```
+mongo
+config={"_id":"config","members":
+    [{"_id":0,"host":"192.168.20.126:27017"},
+     {"_id":1,"host":"192.168.20.54:27017"},
+     {"_id":2,"host":"192.168.20.68:27017","arbiterOnly":true}]
+} 
+
+rs.initiate(config);
+#如果出现下面的结果说明配置成功
+#'{ "ok" : 1 }'
+```
+
+查看状态
+rs.status();
+```
+{
+	"set" : "config",
+	"date" : ISODate("2019-03-10T07:25:23.098Z"),
+	"myState" : 1,
+	"term" : NumberLong(3),
+	"syncingTo" : "",
+	"syncSourceHost" : "",
+	"syncSourceId" : -1,
+	"heartbeatIntervalMillis" : NumberLong(2000),
+	"optimes" : {
+		"lastCommittedOpTime" : {
+			"ts" : Timestamp(1552202714, 1),
+			"t" : NumberLong(3)
+		},
+		"appliedOpTime" : {
+			"ts" : Timestamp(1552202714, 1),
+			"t" : NumberLong(3)
+		},
+		"durableOpTime" : {
+			"ts" : Timestamp(1552202714, 1),
+			"t" : NumberLong(3)
+		}
+	},
+	"members" : [
+		{
+			"_id" : 0,
+			"name" : "quote-socket:27017",
+			"health" : 1,
+			"state" : 2,
+			"stateStr" : "SECONDARY",
+			"uptime" : 3394,
+			"optime" : {
+				"ts" : Timestamp(1552202714, 1),
+				"t" : NumberLong(3)
+			},
+			"optimeDurable" : {
+				"ts" : Timestamp(1552202714, 1),
+				"t" : NumberLong(3)
+			},
+			"optimeDate" : ISODate("2019-03-10T07:25:14Z"),
+			"optimeDurableDate" : ISODate("2019-03-10T07:25:14Z"),
+			"lastHeartbeat" : ISODate("2019-03-10T07:25:21.916Z"),
+			"lastHeartbeatRecv" : ISODate("2019-03-10T07:25:21.276Z"),
+			"pingMs" : NumberLong(0),
+			"lastHeartbeatMessage" : "",
+			"syncingTo" : "192.168.20.54:27017",
+			"syncSourceHost" : "192.168.20.54:27017",
+			"syncSourceId" : 1,
+			"infoMessage" : "",
+			"configVersion" : 3
+		},
+		{
+			"_id" : 1,
+			"name" : "192.168.20.54:27017",
+			"health" : 1,
+			"state" : 1,
+			"stateStr" : "PRIMARY",
+			"uptime" : 12495,
+			"optime" : {
+				"ts" : Timestamp(1552202714, 1),
+				"t" : NumberLong(3)
+			},
+			"optimeDate" : ISODate("2019-03-10T07:25:14Z"),
+			"syncingTo" : "",
+			"syncSourceHost" : "",
+			"syncSourceId" : -1,
+			"infoMessage" : "",
+			"electionTime" : Timestamp(1552196222, 1),
+			"electionDate" : ISODate("2019-03-10T05:37:02Z"),
+			"configVersion" : 3,
+			"self" : true,
+			"lastHeartbeatMessage" : ""
+		},
+		{
+			"_id" : 2,
+			"name" : "192.168.20.68:27017",
+			"health" : 1,
+			"state" : 7,
+			"stateStr" : "ARBITER",
+			"uptime" : 11366,
+			"lastHeartbeat" : ISODate("2019-03-10T07:25:21.907Z"),
+			"lastHeartbeatRecv" : ISODate("2019-03-10T07:25:18.454Z"),
+			"pingMs" : NumberLong(0),
+			"lastHeartbeatMessage" : "",
+			"syncingTo" : "",
+			"syncSourceHost" : "",
+			"syncSourceId" : -1,
+			"infoMessage" : "",
+			"configVersion" : 3
+		}
+	],
+	"ok" : 1
+}
+```
+
+
+### 二、分片集群搭建
+#### 基本概念
+* mongos：即路由器，可以有多个，相当于一个控制中心，负责路由和协调操作，使得集群像一个整体的系统。
+* config server：存储集群的信息，包括分片和块数据信息。主要存储块数据信息，每个config server上都有一份所有块数据信息的拷贝，以保证每台config server上的数据的一致性。
+* 分片 置分片时，需要从集合里面选一个键，用该键的值作为数据拆分的依据。这个键称为片键(shard key)。  
+{department:"IT",name:"zhangsan"},{department:"HR",name:"lisi"},{department:"SUPPORT",name:"zhaowu"}
+以该数据为例，表示的是职员名字以及所在的部门，假若我们设置部门（department）为片键，那么第一片可能存放名称以字母A-F开头的部门，第二片存放名称以G~P开头的部门，第三片存Q~Z，
+请求步骤：客户端 =》Server=》 请求=》 mongos=》 config Server
+
+
+#### 1. 机器准备
+192.168.20.68
+192.168.21.49
+192.168.20.54
+
+
+#### 2. 分别在每台机器上建立mongodb分片对应测试文件夹。
+#存放mongodb数据文件
+mkdir -p /data/mongodbtest
+#进入mongodb文件夹
+cd  /data/mongodbtest
+
+#### 3. 分别在每台机器建立mongos 、config 、 shard1 、shard2、shard3 五个目录。
+因为mongos不存储数据，只需要建立日志文件目录即可。
+
+mkdir -p /data/mongodbtest/mongos/log
+#建立config server 数据文件存放目录
+mkdir -p /data/mongodbtest/config/data
+#建立config server 日志文件存放目录
+mkdir -p /data/mongodbtest/config/log
+#建立config server 日志文件存放目录
+mkdir -p /data/mongodbtest/mongos/log
+#建立shard1 数据文件存放目录
+mkdir -p /data/mongodbtest/shard1/data
+#建立shard1 日志文件存放目录
+mkdir -p /data/mongodbtest/shard1/log
+#建立shard2 数据文件存放目录
+mkdir -p /data/mongodbtest/shard2/data
+#建立shard2 日志文件存放目录
+mkdir -p /data/mongodbtest/shard2/log
+#建立shard3 数据文件存放目录
+mkdir -p /data/mongodbtest/shard3/data
+#建立shard3 日志文件存放目录
+mkdir -p /data/mongodbtest/shard3/log
+
+#### 4. 规划5个组件对应的端口号，由于一个机器需要同时部署 mongos、config server 、shard1、shard2、shard3，所以需要用端口进行区分。
+这个端口可以自由定义，在本文 mongos为 20000， config server 为 21000， shard1为 22001 ， shard2为22002， shard3为22003.
+
+#### 5. 在每一台服务器分别启动配置服务器。
+mongod --configsvr --replSet cfgReplSet --dbpath /data/mongodbtest/config/data --port 21000 --logpath /data/mongodbtest/config/log/config.log --fork
+
+注意：–replSet cfgReplSet这个参数是mongodb 3.4之后的要求，因为mongodb3.4之后，要求config server也做成副本集
+
+#### 6.配置config server为副本集
+连接到任意一台config server：
+mongo --host 127.0.0.1 --port 21000
+rs.initiate({_id:"cfgReplSet",configsvr:true,members:[{_id:0,host:"192.168.20.68:21000"},{_id:1,host:"192.168.21.49:21000"},{_id:2,host:"192.168.20.54:21000"}]}) 
+
+注意：如果提示 192.168.21.49:21000' has data already, cannot initiate set. 需要删除重装
+
+#### 7. 在每一台服务器分别启动mongos服务器
+mongos  --configdb cfgReplSet/192.168.20.68:21000,192.168.20.126:21000,192.168.21.49:21000 --port  20000  --logpath /data/mongodbtest/mongos/log/mongos.log --fork
+
+* 以上config server和mongos连接起来了
+
+#### 8.配置各个分片的副本集。
+mongod --config /etc/mongod-shard1.conf
+
+##### A. 在每台服务器分别设置配置
+vi /etc/mongod-shard1.conf 
+```
+# mongod-shard1.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path: /data/mongodbtest/shard1/log/shard1.log
+
+# Where and how to store data.
+storage:
+  dbPath: /data/mongodbtest/shard1/data
+  journal:
+    enabled: true
+#  engine:
+#  mmapv1:
+#  wiredTiger:
+
+# how the process runs
+processManagement:
+  fork: true  # fork and run in background
+  pidFilePath: /var/run/mongodb/mongod.pid  # location of pidfile
+
+# network interfaces
+net:
+  port: 22001
+  bindIp: 0.0.0.0  # Listen to local interface only, comment to listen on all interfaces.
+
+
+#security:
+
+#operationProfiling:
+
+replication:
+   replSetName: shard1ReplSet
+
+#sharding:
+
+## Enterprise-Only Options
+
+#auditLog:
+
+#snmp:
+
+```
+
+vi /etc/mongod-shard2.conf 
+```
+# mongod-shard2.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path: /data/mongodbtest/shard2/log/shard2.log
+
+# Where and how to store data.
+storage:
+  dbPath: /data/mongodbtest/shard2/data
+  journal:
+    enabled: true
+#  engine:
+#  mmapv1:
+#  wiredTiger:
+
+# how the process runs
+processManagement:
+  fork: true  # fork and run in background
+  pidFilePath: /var/run/mongodb/mongod.pid  # location of pidfile
+
+# network interfaces
+net:
+  port: 22002
+  bindIp: 0.0.0.0  # Listen to local interface only, comment to listen on all interfaces.
+
+
+#security:
+
+#operationProfiling:
+
+replication:
+   replSetName: shard2ReplSet
+
+#sharding:
+
+## Enterprise-Only Options
+
+#auditLog:
+
+#snmp:
+
+```
+
+
+vi /etc/mongod-shard3.conf 
+
+```
+# mongod-shard3.conf
+
+# for documentation of all options, see:
+#   http://docs.mongodb.org/manual/reference/configuration-options/
+
+# where to write logging data.
+systemLog:
+  destination: file
+  logAppend: true
+  path: /data/mongodbtest/shard3/log/shard3.log
+
+# Where and how to store data.
+storage:
+  dbPath: /data/mongodbtest/shard3/data
+  journal:
+    enabled: true
+#  engine:
+#  mmapv1:
+#  wiredTiger:
+
+# how the process runs
+processManagement:
+  fork: true  # fork and run in background
+  pidFilePath: /var/run/mongodb/mongod.pid  # location of pidfile
+
+# network interfaces
+net:
+  port: 22003
+  bindIp: 0.0.0.0  # Listen to local interface only, comment to listen on all interfaces.
+
+
+#security:
+
+#operationProfiling:
+
+replication:
+   replSetName: shard3ReplSet
+
+#sharding:
+
+## Enterprise-Only Options
+
+#auditLog:
+
+#snmp:
+
+```
+
+##### B. 在每台服务器分别设置分片1服务器及副本集，分片2服务器及副本集，分片3服务器及副本集
+mongod --config /etc/mongod-shard1.conf
+mongod --config /etc/mongod-shard2.conf
+mongod --config /etc/mongod-shard3.conf
+
+
+分别对每个分片配置副本集。
+任意登陆一个机器，比如登陆192.168.0.136，连接mongodb. 
+mongo  127.0.0.1:22001
+#使用admin数据库
+use admin
+config = { _id:"shard1ReplSet", members:[
+                     {_id:0,host:"192.168.20.68:22001"},
+                     {_id:1,host:"192.168.21.49:22001"},
+                     {_id:2,host:"192.168.20.54:22001",arbiterOnly:true}
+                ]
+         }
+rs.initiate(config);
+
+#### 9、目前搭建了mongodb配置服务器、路由服务器，各个分片服务器，不过应用程序连接到 mongos 路由服务器并不能使用分片机制，还需要在程序里设置分片配置，让分片生效。
+连接到mongos
+/data/mongodbtest/mongodb-linux-x86_64-2.4.8/bin/mongo  127.0.0.1:20000
+使用admin数据库
+`user  admin`
+串联路由服务器与分配副本集1
+`db.runCommand( { addshard : "shard1/192.168.0.136:22001,192.168.0.137:22001,192.168.0.138:22001"});`
+串联路由服务器与分配副本集2
+`db.runCommand( { addshard : "shard2/192.168.0.136:22002,192.168.0.137:22002,192.168.0.138:22002"});`
+串联路由服务器与分配副本集3
+`db.runCommand( { addshard : "shard3/192.168.0.136:22003,192.168.0.137:22003,192.168.0.138:22003"});`
+查看分片服务器的配置
+`db.runCommand( { listshards : 1 } );`
+
+* 以上分片集群已经搭建完毕
+
+#### 10 设置分片
+##### 分片分为 范围分片 和 哈希分片。分片键的选择：
+合适的分片键具有以下特点：
+所有的插入、更新以及删除操作，将会均匀分发到集群中的所有分片中。
+key的分布足够离散。尽量避免scatter-gather查询。
+
+* 注：如果分布均匀会造成某台shard磁盘不够用，如果分布太散会造成聚合查询（即每台shard都要查一遍然后聚合数据，这回影响效率)；
+如果是大集群我个人认为应该选择适合业务查询的范围字段（保证范围查询不是命中所有分片） + 哈希字段（保证分片均匀）
+
+##### 分片
+> 这里我们选择_id的哈希分片（集群比较小的话_id的分片足够了）
+
+A. 设置数据库允许分片
+`sh.enableSharding("<database>")`
+B. 根据业务需求，对集合选择合适的分片键，并在该分片键上创建索引。
+`db.<collection>.createIndex(<keys>,<options>)`
+C.对集合进行分片
+`sh.shardCollection("<database>.<collection>",{"_id"："hashed" })`
+
+
+
+* 参考文档及拓展阅读  
+搭建  
+
+[4.搭建高可用mongodb集群（二）—— 副本集](https://www.cnblogs.com/wangjing666/p/6837272.html)
